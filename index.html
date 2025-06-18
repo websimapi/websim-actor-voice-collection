@@ -383,16 +383,11 @@
             stopAll();
 
             try {
-                // Fetch the audio file and convert it to a Blob
-                const response = await fetch(voiceSample);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch voice sample: ${response.statusText}`);
-                }
-                const voiceBlob = await response.blob();
-
+                // The websim.textToSpeech function with voice_sample expects a URL string.
+                // The voiceSample variable already holds the relative path to the audio file.
                 const result = await websim.textToSpeech({
                     text: textToSpeak,
-                    voice_sample: voiceBlob,
+                    voice_sample: voiceSample,
                 });
 
                 outputContainer.innerHTML = ''; // Clear loading message
