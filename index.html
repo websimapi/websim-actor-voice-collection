@@ -345,7 +345,10 @@
         function playRandom() {
             const randomIndex = Math.floor(Math.random() * voices.length);
             const buttons = document.querySelectorAll('.play-button');
-            playVoice(voices[randomIndex].file, buttons[randomIndex]);
+            // Ensure the button exists before trying to click it
+            if(buttons[randomIndex]) {
+                buttons[randomIndex].click();
+            }
         }
 
         function populateVoiceSelector() {
@@ -380,9 +383,16 @@
             stopAll();
 
             try {
+                // Fetch the audio file and convert it to a Blob
+                const response = await fetch(voiceSample);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch voice sample: ${response.statusText}`);
+                }
+                const voiceBlob = await response.blob();
+
                 const result = await websim.textToSpeech({
                     text: textToSpeak,
-                    voice_sample: voiceSample,
+                    voice_sample: voiceBlob,
                 });
 
                 outputContainer.innerHTML = ''; // Clear loading message
