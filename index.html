@@ -33,6 +33,152 @@
             font-size: 2.5rem;
             margin-bottom: 30px;
         }
+
+        /* Tab Navigation Styles */
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 5px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Tab Content Styles */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* TTS Tab Styles */
+        .tts-tab {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .voice-selector-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: flex-end;
+        }
+
+        .voice-dropdown-container {
+            flex: 1;
+        }
+
+        .voice-dropdown-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        #voice-dropdown {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        #voice-dropdown option {
+            background: #4a5568;
+            color: white;
+        }
+
+        #random-voice-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 20px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #random-voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .selected-voice-preview {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .preview-title {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .preview-script {
+            font-style: italic;
+            opacity: 0.9;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .preview-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .preview-play-btn {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .preview-play-btn:hover {
+            transform: scale(1.05);
+        }
         
         .voices-grid {
             display: grid;
@@ -136,33 +282,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* TTS Section Styles */
-        .tts-section {
-            padding: 40px 0;
-            background: rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
-        }
-
-        .tts-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: center;
-        }
-
-        #selected-voice-info {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 15px 25px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            text-align: center;
-            width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
         #tts-text {
             width: 100%;
             min-height: 120px;
@@ -173,6 +292,7 @@
             color: white;
             font-size: 1rem;
             resize: vertical;
+            margin-bottom: 20px;
         }
 
         #tts-text::placeholder {
@@ -200,13 +320,6 @@
         }
 
         /* Gallery Styles */
-        .gallery-section {
-            margin-top: 60px;
-            padding: 40px 0;
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 20px;
-        }
-
         .gallery-container {
             max-width: 900px;
             margin: 0 auto;
@@ -299,33 +412,65 @@
     <div class="container">
         <h1>🎭 Actor Voice Collection</h1>
         
-        <div class="controls">
-            <button class="control-button" onclick="stopAll()">Stop All</button>
-            <button class="control-button" onclick="playRandom()">Play Random</button>
-        </div>
-        
-        <div class="voices-grid" id="voicesGrid">
-            <!-- Voice cards will be generated by JavaScript -->
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab('tts')">🎙️ Voice Cloning</button>
+            <button class="tab-button" onclick="switchTab('voices')">🎭 Voice Collection</button>
+            <button class="tab-button" onclick="switchTab('gallery')">🎵 Community Gallery</button>
         </div>
 
-        <section class="tts-section" id="tts-demo">
-            <h2>🎙️ Voice Cloning TTS</h2>
-            <div class="tts-container">
-                <div id="selected-voice-info">Please select a voice from the collection above.</div>
+        <!-- TTS Tab -->
+        <div id="tts-tab" class="tab-content active">
+            <div class="tts-tab">
+                <h2>🎙️ Voice Cloning TTS</h2>
+                
+                <div class="voice-selector-container">
+                    <div class="voice-dropdown-container">
+                        <label for="voice-dropdown" class="voice-dropdown-label">Select Voice:</label>
+                        <select id="voice-dropdown" onchange="selectVoiceFromDropdown()">
+                            <option value="">Choose a voice...</option>
+                        </select>
+                    </div>
+                    <button id="random-voice-btn" onclick="selectRandomVoice()">🎲 Random</button>
+                </div>
+
+                <div id="selected-voice-preview" class="selected-voice-preview" style="display: none;">
+                    <div class="preview-title" id="preview-title"></div>
+                    <div class="preview-script" id="preview-script"></div>
+                    <div class="preview-controls">
+                        <button class="preview-play-btn" id="preview-play-btn" onclick="playPreview()">▶ Preview</button>
+                    </div>
+                </div>
+
                 <textarea id="tts-text" placeholder="Enter text here to generate speech with the selected voice..."></textarea>
-                <button id="generate-tts-btn" class="control-button">Generate Speech</button>
+                <div style="text-align: center;">
+                    <button id="generate-tts-btn" class="control-button">Generate Speech</button>
+                </div>
                 <div id="tts-output" style="display: none;">
                     <audio controls></audio>
                 </div>
             </div>
-        </section>
+        </div>
 
-        <section class="gallery-section" id="gallery">
+        <!-- Voices Tab -->
+        <div id="voices-tab" class="tab-content">
+            <h2>🎭 Voice Collection</h2>
+            <div class="controls">
+                <button class="control-button" onclick="stopAll()">Stop All</button>
+                <button class="control-button" onclick="playRandomFromCollection()">Play Random</button>
+            </div>
+            <div class="voices-grid" id="voicesGrid">
+                <!-- Voice cards will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Gallery Tab -->
+        <div id="gallery-tab" class="tab-content">
             <h2>🎵 Community Generated Voices</h2>
             <div class="gallery-container" id="galleryContainer">
                 <!-- Generated TTS samples will appear here -->
             </div>
-        </section>
+        </div>
     </div>
 
     <script>
@@ -389,6 +534,107 @@
         let currentButton = null;
         let selectedVoiceForTTS = null;
         let uploadedVoiceUrls = {}; // Cache for uploaded URLs
+        let previewAudio = null;
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab button
+            event.target.classList.add('active');
+        }
+
+        // Populate voice dropdown
+        function populateVoiceDropdown() {
+            const dropdown = document.getElementById('voice-dropdown');
+            voices.forEach((voice, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = voice.title;
+                dropdown.appendChild(option);
+            });
+        }
+
+        // Select voice from dropdown
+        function selectVoiceFromDropdown() {
+            const dropdown = document.getElementById('voice-dropdown');
+            const selectedIndex = dropdown.value;
+            
+            if (selectedIndex === '') {
+                hideVoicePreview();
+                return;
+            }
+            
+            selectVoiceForTTS(parseInt(selectedIndex));
+        }
+
+        // Select random voice
+        function selectRandomVoice() {
+            const randomIndex = Math.floor(Math.random() * voices.length);
+            document.getElementById('voice-dropdown').value = randomIndex;
+            selectVoiceForTTS(randomIndex);
+        }
+
+        // Select voice for TTS (updated function)
+        function selectVoiceForTTS(index) {
+            const voice = voices[index];
+            selectedVoiceForTTS = { file: voice.file, title: voice.title, script: voice.script };
+            
+            // Show and update preview
+            showVoicePreview(voice);
+        }
+
+        // Show voice preview
+        function showVoicePreview(voice) {
+            const preview = document.getElementById('selected-voice-preview');
+            const title = document.getElementById('preview-title');
+            const script = document.getElementById('preview-script');
+            
+            title.textContent = voice.title;
+            script.textContent = `"${voice.script}"`;
+            preview.style.display = 'block';
+        }
+
+        // Hide voice preview
+        function hideVoicePreview() {
+            document.getElementById('selected-voice-preview').style.display = 'none';
+            selectedVoiceForTTS = null;
+        }
+
+        // Play preview
+        function playPreview() {
+            if (!selectedVoiceForTTS) return;
+            
+            const button = document.getElementById('preview-play-btn');
+            
+            // Stop current preview if playing
+            if (previewAudio) {
+                previewAudio.pause();
+                previewAudio.currentTime = 0;
+                button.textContent = '▶ Preview';
+            }
+
+            // Play new audio
+            previewAudio = new Audio(selectedVoiceForTTS.file);
+            button.textContent = '⏸️ Playing...';
+            
+            previewAudio.play();
+            
+            previewAudio.onended = function() {
+                button.textContent = '▶ Preview';
+            };
+        }
 
         // Upload audio file to get URL
         async function uploadAudioFile(filename) {
@@ -423,7 +669,7 @@
                         <button class="play-button" onclick="playVoice('${voice.file}', this)">
                             ▶ Play
                         </button>
-                        <button class="use-tts-button" onclick="selectForTTS('${voice.file}', '${voice.title}', ${index})">
+                        <button class="use-tts-button" onclick="selectForTTSFromCard('${voice.file}', '${voice.title}', ${index})">
                             🎙️ Use for TTS
                         </button>
                     </div>
@@ -479,25 +725,26 @@
             }
         }
 
-        function playRandom() {
+        function playRandomFromCollection() {
             stopAll();
             const randomIndex = Math.floor(Math.random() * voices.length);
             const buttons = document.querySelectorAll('.play-button');
             playVoice(voices[randomIndex].file, buttons[randomIndex]);
         }
 
-        function selectForTTS(filename, title, index) {
-            selectedVoiceForTTS = { file: filename, title: title };
-
-            // Update UI
-            document.getElementById('selected-voice-info').innerHTML = `Selected Voice: <strong>${title}</strong>`;
+        function selectForTTSFromCard(filename, title, index) {
+            // Switch to TTS tab
+            switchTab('tts');
+            
+            // Update dropdown selection
+            document.getElementById('voice-dropdown').value = index;
+            
+            // Select the voice
+            selectVoiceForTTS(index);
             
             // Highlight selected card
             document.querySelectorAll('.voice-card').forEach(card => card.classList.remove('selected'));
             document.getElementById(`voice-card-${index}`).classList.add('selected');
-
-            // Scroll to TTS section
-            document.getElementById('tts-demo').scrollIntoView({ behavior: 'smooth' });
         }
 
         async function generateTTS() {
@@ -507,7 +754,7 @@
             const audioPlayer = ttsOutput.querySelector('audio');
 
             if (!selectedVoiceForTTS) {
-                alert('Please select a voice first by clicking "Use for TTS" on a voice card.');
+                alert('Please select a voice first.');
                 return;
             }
 
@@ -558,6 +805,7 @@
         document.getElementById('generate-tts-btn').addEventListener('click', generateTTS);
 
         // Initialize the page
+        populateVoiceDropdown();
         document.getElementById('voicesGrid').innerHTML = voices.map(createVoiceCard).join('');
         
         function renderGallery(voices) {
