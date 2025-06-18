@@ -25,6 +25,97 @@
             margin-bottom: 40px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
+
+        .tts-container {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        .tts-container h2 {
+            font-size: 2rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .tts-container p {
+            margin-bottom: 25px;
+            opacity: 0.9;
+        }
+
+        .tts-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .tts-select, .tts-textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            font-family: 'Arial', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .tts-select {
+            cursor: pointer;
+        }
+
+        .tts-select option {
+            background: #3c2a4d;
+            color: white;
+        }
+
+        .tts-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .tts-textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tts-generate-button {
+            width: 100%;
+            padding: 15px 20px !important;
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+        }
+
+        .tts-generate-button:hover {
+            background: linear-gradient(45deg, #ee5a24, #ff6b6b) !important;
+        }
+        
+        .tts-generate-button:disabled {
+            background: #999 !important;
+            cursor: not-allowed;
+            opacity: 0.7;
+            transform: none !important;
+        }
+
+        .tts-output {
+            margin-top: 25px;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tts-output audio {
+            width: 100%;
+            max-width: 600px;
+        }
         
         .voices-grid {
             display: grid;
@@ -112,6 +203,17 @@
 <body>
     <div class="container">
         <h1>🎭 Actor Voice Collection</h1>
+
+        <div class="tts-container">
+            <h2>🎙️ Advanced TTS Voice Cloning</h2>
+            <p>Select a voice actor, type your script, and generate a new voice clip!</p>
+            <div class="tts-controls">
+                <select id="voice-selector" class="tts-select"></select>
+                <textarea id="tts-input" class="tts-textarea" placeholder="Enter your script here..."></textarea>
+                <button id="generate-tts-button" class="control-button tts-generate-button">Generate Voice</button>
+            </div>
+            <div id="tts-output" class="tts-output"></div>
+        </div>
         
         <div class="controls">
             <button class="control-button" onclick="stopAll()">Stop All</button>
@@ -246,10 +348,68 @@
             playVoice(voices[randomIndex].file, buttons[randomIndex]);
         }
 
+        function populateVoiceSelector() {
+            const selector = document.getElementById('voice-selector');
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.file;
+                option.textContent = voice.title;
+                selector.appendChild(option);
+            });
+        }
+        
+        async function handleGenerateTTS() {
+            const selector = document.getElementById('voice-selector');
+            const input = document.getElementById('tts-input');
+            const button = document.getElementById('generate-tts-button');
+            const outputContainer = document.getElementById('tts-output');
+
+            const voiceSample = selector.value;
+            const textToSpeak = input.value.trim();
+
+            if (!textToSpeak) {
+                alert("Please enter some text to generate audio.");
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Generating...';
+            outputContainer.innerHTML = '<p>Cloning voice and generating audio, please wait...</p>';
+            
+            // Stop any currently playing sample audio to prevent resource conflicts
+            stopAll();
+
+            try {
+                const result = await websim.textToSpeech({
+                    text: textToSpeak,
+                    voice_sample: voiceSample,
+                });
+
+                outputContainer.innerHTML = ''; // Clear loading message
+                const audioEl = document.createElement('audio');
+                audioEl.controls = true;
+                audioEl.src = result.url;
+                audioEl.autoplay = true;
+                outputContainer.appendChild(audioEl);
+
+            } catch (error) {
+                console.error("TTS Generation Error:", error);
+                outputContainer.innerHTML = `<p style="color: #ff6b6b;">Sorry, there was an error generating the voice. Please try again.</p>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Generate Voice';
+            }
+        }
+
+        function init() {
+            document.getElementById('voicesGrid').innerHTML = voices.map(createVoiceCard).join('');
+            populateVoiceSelector();
+            document.getElementById('generate-tts-button').addEventListener('click', handleGenerateTTS);
+        }
+
         // Initialize the page
-        document.getElementById('voicesGrid').innerHTML = voices.map(createVoiceCard).join('');
+        init();
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-
