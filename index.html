@@ -572,6 +572,11 @@
             
             if (selectedIndex === '') {
                 hideVoicePreview();
+                if (previewAudio) {
+                    previewAudio.pause();
+                    previewAudio = null;
+                }
+                document.getElementById('preview-play-btn').textContent = '▶ Preview';
                 return;
             }
             
@@ -589,6 +594,13 @@
         function selectVoiceForTTS(index) {
             const voice = voices[index];
             selectedVoiceForTTS = { file: voice.file, title: voice.title, script: voice.script };
+
+            // Stop and clear any existing preview audio from another voice
+            if (previewAudio) {
+                previewAudio.pause();
+                previewAudio = null;
+            }
+            document.getElementById('preview-play-btn').textContent = '▶ Preview';
             
             // Show and update preview
             showVoicePreview(voice);
@@ -614,23 +626,26 @@
             if (!selectedVoiceForTTS) return;
             
             const button = document.getElementById('preview-play-btn');
-            
-            // Stop current preview if playing
-            if (previewAudio) {
-                previewAudio.pause();
-                previewAudio.currentTime = 0;
-                button.textContent = '▶ Preview';
+
+            // If there's no preview audio object for the current voice, create it
+            if (!previewAudio) {
+                previewAudio = new Audio(selectedVoiceForTTS.file);
+                previewAudio.onended = function() {
+                    button.textContent = '▶ Preview';
+                    button.classList.remove('playing');
+                };
             }
 
-            // Play new audio
-            previewAudio = new Audio(selectedVoiceForTTS.file);
-            button.textContent = '⏸️ Playing...';
-            
-            previewAudio.play();
-            
-            previewAudio.onended = function() {
+            // Toggle play/pause
+            if (previewAudio.paused) {
+                previewAudio.play();
+                button.textContent = '⏸️ Pause';
+                button.classList.add('playing');
+            } else {
+                previewAudio.pause();
                 button.textContent = '▶ Preview';
-            };
+                button.classList.remove('playing');
+            }
         }
 
         // Upload audio file to get URL
