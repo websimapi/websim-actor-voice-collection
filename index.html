@@ -199,6 +199,83 @@
             width: 100%;
         }
 
+        /* Gallery Styles */
+        .gallery-section {
+            margin-top: 60px;
+            padding: 40px 0;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+        }
+
+        .gallery-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .gallery-item {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .gallery-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .gallery-info {
+            flex-grow: 1;
+        }
+
+        .username {
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+
+        .voice-type {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+
+        .timestamp {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        .gallery-text {
+            font-style: italic;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+
+        .gallery-audio {
+            width: 100%;
+            height: 40px;
+        }
+
         /* Loading Spinner */
         .spinner {
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -240,6 +317,13 @@
                 <div id="tts-output" style="display: none;">
                     <audio controls></audio>
                 </div>
+            </div>
+        </section>
+
+        <section class="gallery-section" id="gallery">
+            <h2>🎵 Community Generated Voices</h2>
+            <div class="gallery-container" id="galleryContainer">
+                <!-- Generated TTS samples will appear here -->
             </div>
         </section>
     </div>
@@ -297,6 +381,9 @@
                 file: "fantasy_wizard.mp3"
             }
         ];
+
+        // Initialize database connection
+        const room = new WebsimSocket();
 
         let currentAudio = null;
         let currentButton = null;
@@ -446,6 +533,17 @@
                 ttsOutput.style.display = 'block';
                 audioPlayer.play();
 
+                // Save to database
+                await room.collection('generated_voice').create({
+                    text: text,
+                    voice_type: selectedVoiceForTTS.title,
+                    audio_url: result.url,
+                    voice_sample_file: selectedVoiceForTTS.file
+                });
+
+                // Clear the text area after successful generation
+                document.getElementById('tts-text').value = '';
+
             } catch (error) {
                 console.error('TTS Generation Error:', error);
                 alert('Sorry, there was an error generating the speech. Please try again.');
@@ -461,6 +559,34 @@
 
         // Initialize the page
         document.getElementById('voicesGrid').innerHTML = voices.map(createVoiceCard).join('');
+        
+        function renderGallery(voices) {
+            const container = document.getElementById('galleryContainer');
+            if (voices.length === 0) {
+                container.innerHTML = '<p style="text-align: center; opacity: 0.7;">No generated voices yet. Be the first to create one!</p>';
+                return;
+            }
+
+            container.innerHTML = voices.reverse().map(voice => `
+                <div class="gallery-item">
+                    <div class="gallery-header">
+                        <img src="https://images.websim.com/avatar/${voice.username}" alt="${voice.username}" class="user-avatar">
+                        <div class="gallery-info">
+                            <div class="username">@${voice.username}</div>
+                            <div class="voice-type">${voice.voice_type}</div>
+                            <div class="timestamp">${new Date(voice.created_at).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    <div class="gallery-text">"${voice.text}"</div>
+                    <audio controls class="gallery-audio">
+                        <source src="${voice.audio_url}" type="audio/wav">
+                    </audio>
+                </div>
+            `).join('');
+        }
+
+        // Subscribe to gallery updates
+        room.collection('generated_voice').subscribe(renderGallery);
     </script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
