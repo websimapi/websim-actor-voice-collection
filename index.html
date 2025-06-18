@@ -436,7 +436,6 @@
 
                 <div id="selected-voice-preview" class="selected-voice-preview" style="display: none;">
                     <div class="preview-title" id="preview-title"></div>
-                    <div class="preview-script" id="preview-script"></div>
                     <div class="preview-controls">
                         <button class="preview-play-btn" id="preview-play-btn" onclick="playPreview()">▶ Preview</button>
                     </div>
@@ -599,10 +598,8 @@
         function showVoicePreview(voice) {
             const preview = document.getElementById('selected-voice-preview');
             const title = document.getElementById('preview-title');
-            const script = document.getElementById('preview-script');
             
             title.textContent = voice.title;
-            script.textContent = `"${voice.script}"`;
             preview.style.display = 'block';
         }
 
